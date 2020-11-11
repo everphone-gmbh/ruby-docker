@@ -140,7 +140,15 @@ COPY . /app/
 ## "access_cloud_sql" script which databases to connect to.
 ## Also, make sure the /cloudsql directory is created because the CloudSQL
 ## Proxy will open sockets in that directory.
-<% if cloud_sql_instances.empty? %>
+<% if cloud_sql_instance.present?%>
+ARG BUILD_CLOUDSQL_INSTANCES="<%= cloud_sql_instance %>"
+RUN mkdir /cloudsql
+<%
+cloud_sql_instances = []
+end
+%>
+
+<% if cloud_sql_instances.empty? && !cloud_sql_instance.present? %>
 # ARG BUILD_CLOUDSQL_INSTANCES="<%= project_id_for_example %>:db-region:db-name"
 # RUN mkdir /cloudsql
 <% else %>

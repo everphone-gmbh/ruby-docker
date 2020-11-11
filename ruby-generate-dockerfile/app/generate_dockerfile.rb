@@ -84,6 +84,9 @@ class GenerateDockerfile
       opts.on "--default-ruby-version=VERSION" do |version|
         @default_ruby_version = version
       end
+      opts.on "--cloud-sql-instance=CLOUD_SQL_INSTANCE" do |cloud_sql_instance|
+        @cloud_sql_instance = cloud_sql_instance
+      end
     end.parse! args
   end
 
@@ -97,7 +100,7 @@ class GenerateDockerfile
     b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
                               @build_tools_image, @prebuilt_ruby_images,
                               @default_ruby_version, @bundler1_version,
-                              @bundler2_version).instance_eval{ binding }
+                              @bundler2_version, @cloud_sql_instance).instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
       ::STDERR.puts "Unable to generate Dockerfile because one already exists."
@@ -135,7 +138,7 @@ class GenerateDockerfile
   class TemplateCallbacks < SimpleDelegator
     def initialize app_config, timestamp, base_image, build_tools_image,
                    prebuilt_ruby_images, default_ruby_version,
-                   bundler1_version, bundler2_version
+                   bundler1_version, bundler2_version, cloud_sql_instance
       @timestamp = timestamp
       @base_image = base_image
       @build_tools_image = build_tools_image
@@ -143,6 +146,7 @@ class GenerateDockerfile
       @default_ruby_version = default_ruby_version
       @bundler1_version = bundler1_version
       @bundler2_version = bundler2_version
+      @cloud_sql_instance = cloud_sql_instance
       super app_config
     end
 
