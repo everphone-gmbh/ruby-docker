@@ -105,7 +105,7 @@ for version in "${PREBUILT_VERSIONS[@]}"; do
 done
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to proceed? [Y/n] " response
-  response=${response,,}  # tolower
+  response=${response} | sed -e 's/\(.*\)/\L\1/'  # tolower
   if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1

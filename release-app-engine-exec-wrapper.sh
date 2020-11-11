@@ -80,7 +80,7 @@ echo "Releasing exec wrapper:"
 echo "  ${WRAPPER_IMAGE}:${IMAGE_TAG}"
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to proceed? [Y/n] " response
-  response=${response,,}  # tolower
+  response=${response} | sed -e 's/\(.*\)/\L\1/'  # tolower
   if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1

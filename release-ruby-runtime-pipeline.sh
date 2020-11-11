@@ -22,7 +22,7 @@ DIRNAME=$(dirname $0)
 UPLOAD_BUCKET=
 RUNTIME_NAME=ruby
 PROJECT=
-RUNTIME_VERSION=staging
+RUNTIME_VERSION=20201106174447
 AUTO_YES=
 
 show_usage() {
@@ -30,7 +30,7 @@ show_usage() {
   echo 'Flags:' >&2
   echo '  -b <bucket>: promote the runtime definition in this gcs bucket (required)' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -p <project>: set the builder images project (defaults to current gcloud config setting)' >&2
+  echo '  -p <prnoject>: set the builder images project (defaults to current gcloud config setting)' >&2
   echo '  -r <version>: release this runtime (defaults to staging)' >&2
   echo '  -y: automatically confirm' >&2
 }
@@ -92,7 +92,7 @@ echo
 echo "Releasing runtime: ${SOURCE_GS_URL}"
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to proceed? [Y/n] " response
-  response=${response,,}  # tolower
+  response=${response} | sed -e 's/\(.*\)/\L\1/' # tolower
   if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1

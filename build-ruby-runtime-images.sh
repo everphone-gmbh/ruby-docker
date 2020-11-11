@@ -18,7 +18,7 @@
 # This is the Ruby version that is installed in the "basic" convenience image
 # and that is used to run generate-dockerfile. It is NOT the same as the Ruby
 # version used by the runtime by default if one is not specified by the app.
-BASIC_RUBY_VERSION=2.6.6
+BASIC_RUBY_VERSION=2.7.2
 
 BUNDLER1_VERSION=1.17.3
 BUNDLER2_VERSION=2.0.2
@@ -125,7 +125,7 @@ else
 fi
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to build? [Y/n] " response
-  response=${response,,}  # tolower
+  response=${response} | sed -e 's/\(.*\)/\L\1/' #tolower
   if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1

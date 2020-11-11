@@ -169,7 +169,7 @@ echo "  ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
 echo "Default Ruby version is ${DEFAULT_RUBY_VERSION}"
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to build? [Y/n] " response
-  response=${response,,}  # tolower
+  response=${response} | sed -e 's/\(.*\)/\L\1/' # tolower
   if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1
