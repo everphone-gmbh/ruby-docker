@@ -42,8 +42,9 @@ class AppConfig
   attr_reader :ruby_version
   attr_reader :has_gemfile
 
-  def initialize workspace_dir
+  def initialize workspace_dir, argument_app_yaml
     @workspace_dir = workspace_dir
+    @argument_app_yaml = argument_app_yaml
     init_app_config  # Must be called first
     init_project_id
     init_env_variables
@@ -57,7 +58,8 @@ class AppConfig
   private
 
   def init_app_config
-    @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || DEFAULT_APP_YAML_PATH
+    app_yaml_path = @argument_app_yaml || DEFAULT_APP_YAML_PATH
+    @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || app_yaml_path
     config_file = "#{@workspace_dir}/#{@app_yaml_path}"
     begin
       @app_config = ::Psych.load_file config_file

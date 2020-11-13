@@ -21,6 +21,7 @@ require "delegate"
 require_relative "app_config.rb"
 
 class GenerateDockerfile
+  DEFAULT_APP_YAML = nil
   DEFAULT_WORKSPACE_DIR = "/workspace"
   GENERATOR_DIR = ::File.absolute_path(::File.dirname __FILE__)
   DOCKERIGNORE_PATHS = [
@@ -33,6 +34,7 @@ class GenerateDockerfile
 
   def initialize args
     @workspace_dir = DEFAULT_WORKSPACE_DIR
+    @argument_app_yaml = DEFAULT_APP_YAML
     @base_image = ::ENV["DEFAULT_RUBY_BASE_IMAGE"]
     @build_tools_image = ::ENV["DEFAULT_RUBY_BUILD_TOOLS_IMAGE"]
     @prebuilt_ruby_images = {}
@@ -46,7 +48,7 @@ class GenerateDockerfile
     parse_args args
     ::Dir.chdir @workspace_dir
     begin
-      @app_config = ::AppConfig.new @workspace_dir
+      @app_config = ::AppConfig.new @workspace_dir, @argument_app_yaml
     rescue ::AppConfig::Error => ex
       ::STDERR.puts ex.message
       exit 1
@@ -84,6 +86,9 @@ class GenerateDockerfile
       opts.on "--default-ruby-version=VERSION" do |version|
         @default_ruby_version = version
       end
+      opts.on "--app-yaml=APPYAML" do |appyaml|
+        @argument_app_yaml = appyaml
+      end
     end.parse! args
   end
 
@@ -97,7 +102,7 @@ class GenerateDockerfile
     b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
                               @build_tools_image, @prebuilt_ruby_images,
                               @default_ruby_version, @bundler1_version,
-                              @bundler2_version).instance_eval{ binding }
+                              @bundler2_version, $argument_app_yaml).instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
       ::STDERR.puts "Unable to generate Dockerfile because one already exists."
@@ -135,7 +140,7 @@ class GenerateDockerfile
   class TemplateCallbacks < SimpleDelegator
     def initialize app_config, timestamp, base_image, build_tools_image,
                    prebuilt_ruby_images, default_ruby_version,
-                   bundler1_version, bundler2_version
+                   bundler1_version, bundler2_version, argument_app_yaml
       @timestamp = timestamp
       @base_image = base_image
       @build_tools_image = build_tools_image
@@ -143,6 +148,7 @@ class GenerateDockerfile
       @default_ruby_version = default_ruby_version
       @bundler1_version = bundler1_version
       @bundler2_version = bundler2_version
+      @argument_app_yaml = argument_app_yaml
       super app_config
     end
 
