@@ -79,6 +79,11 @@ RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
         && (gem install /opt/gems/bundler-<%= @bundler1_version %>.gem ; \
             gem install /opt/gems/bundler-<%= @bundler2_version %>.gem ; \
             rbenv rehash); \
+            && bundle config set deployment 'true' \
+            && bundle config set frozen 'true' \
+            && bundle config set path '/app/vendor/bundle' \
+            && bundle config set without 'development test' \
+            && bundle config --global jobs 3 \
     fi
 ## Alternate installation for Ruby versions that have a prebuilt image.
 # COPY --from=PATH-TO-PREBUILT-IMAGE \
